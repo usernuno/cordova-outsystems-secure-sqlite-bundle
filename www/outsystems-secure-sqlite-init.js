@@ -18,7 +18,7 @@ var lskCache = "";
 
 /**
  * https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0
- * 
+ *
  * Returns a hash code for a string.
  * (Compatible to Java's String.hashCode())
  *
@@ -74,16 +74,32 @@ function acquireLsk(successCallback, errorCallback) {
                         // If there's no key yet, generate a new one and store it
                         var newKey = generateKey();
                         lskCache = undefined;
-                        console.log("Setting new Local Storage key");
-                        ss.set(
-                            function (key) {
-                                lskCache = newKey;
-                                OutSystemsNative.Logger.logError("Setting new Local Storage key (" + hashCode(lskCache) + ")", "SecureSQLiteBundle");
+
+                        OutSystemsNative.Logger.logWarning("Retry getting Local Storage Key", "SecureSQLiteBundle");
+                        ss.get(
+                            function (value) {
+                                lskCache = value;
+                                console.log("[Retry] Got Local Storage key");
+                                OutSystemsNative.Logger.logWarning("[Retry] Got Local Storage key (" + hashCode(lskCache) + ")", "SecureSQLiteBundle");
                                 successCallback(lskCache);
                             },
-                            errorCallback,
-                            LOCAL_STORAGE_KEY,
-                            newKey);
+                            function (error) {
+                                OutSystemsNative.Logger.logError("[Retry] Error received getting Local Storage Key: " + error, "SecureSQLiteBundle");
+                                // If there's no key yet, generate a new one and store it
+                                var newKey = generateKey();
+                                lskCache = undefined;
+                                console.log("Setting new Local Storage key");
+                                ss.set(
+                                    function (key) {
+                                        lskCache = newKey;
+                                        OutSystemsNative.Logger.logError("Retry - Setting new Local Storage key (" + hashCode(lskCache) + ")", "SecureSQLiteBundle");
+                                        successCallback(lskCache);
+                                    },
+                                    errorCallback,
+                                    LOCAL_STORAGE_KEY,
+                                newKey);
+                            },
+                        LOCAL_STORAGE_KEY);
                     },
                     LOCAL_STORAGE_KEY);
             },
@@ -158,12 +174,12 @@ window.sqlitePlugin.openDatabase = function(options, successCallback, errorCallb
                     newOptions[prop] = options[prop];
                 }
             }
-            
+
             // Ensure `location` is set (it is mandatory now)
             if (newOptions.location === undefined) {
                 newOptions.location = "default";
             }
-            
+
             // Set the `key` to the one provided
             newOptions.key = key;
 
