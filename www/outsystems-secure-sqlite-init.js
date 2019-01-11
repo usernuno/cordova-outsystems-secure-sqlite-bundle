@@ -44,7 +44,8 @@ function acquireLsk(successCallback, errorCallback) {
                         successCallback(lskCache);
                     },
                     function (error) {
-                        alert('Got with error, setting...');
+                        alert('Got with error, aborting...');
+                        /*
                         // If there's no key yet, generate a new one and store it
                         var newKey = generateKey();
                         lskCache = undefined;
@@ -58,6 +59,7 @@ function acquireLsk(successCallback, errorCallback) {
                             errorCallback,
                             LOCAL_STORAGE_KEY,
                             newKey);
+                        */
                     },
                     LOCAL_STORAGE_KEY);
             },
