@@ -23,6 +23,7 @@ var lskCache = "";
  * @param {Function} errorCallback      Called when an error occurs acquiring the LSK.
  */
 function acquireLsk(successCallback, errorCallback) {
+    alert('acquireLsk');
     // If the key is cached, use it
     if (lskCache) {
         successCallback(lskCache);
@@ -33,20 +34,24 @@ function acquireLsk(successCallback, errorCallback) {
     var initFn = function() {
         var ss = new SecureStorage(
             function () {
+                alert('Getting...');
                 // and when initialized attempt to get the stored key
                 ss.get(
                     function (value) {
+                        alert('Got with success');
                         lskCache = value;
                         console.log("Got Local Storage key");
                         successCallback(lskCache);
                     },
                     function (error) {
+                        alert('Got with error, setting...');
                         // If there's no key yet, generate a new one and store it
                         var newKey = generateKey();
                         lskCache = undefined;
                         console.log("Setting new Local Storage key");
                         ss.set(
                             function (key) {
+                                alert('Set with success');
                                 lskCache = newKey;
                                 successCallback(lskCache);
                             },
